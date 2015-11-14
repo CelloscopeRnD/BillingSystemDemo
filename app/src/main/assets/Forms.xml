@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<forms>
+    <form no="1" name="WASA Billing Form" submitTo="http://www.dwasa.org.bd">
+        <field id="codeNo" text="Code No" type="text">
+            <validation max="" min="" required="Y" />
+        </field>
+        <field id="accountNo" text="Account No" type="text">
+            <validation max="" min="" required="Y" />
+        </field>
+        <field id="category" text="Category" type="list">
+            <validation max="" min="" required="Y" />
+            <lookUp>
+                <Metered />
+                <NotMetered />
+            </lookUp>
+        </field>
+        <field id="amount" text="Bill Amount" type="numeric">
+            <validation max="" min="" required="Y" />
+        </field>
+        <field id="isDue" text="Due" type="boolean">
+            <validation max="" min="" required="N" />
+        </field>
+        <field type="submit" value="Submit" />
+    </form>
+</forms>
