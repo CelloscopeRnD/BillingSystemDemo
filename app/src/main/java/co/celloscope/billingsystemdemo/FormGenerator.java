@@ -29,7 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class FormGenerator extends Activity {
     String Tag = FormGenerator.class.getName();
-    Form theForm;
+    Form form;
     ProgressDialog progressDialog;
     Handler progressHandler;
 
@@ -61,7 +61,7 @@ public class FormGenerator extends Activity {
      * Get XML metadata which represents a form
      *
      * @param formNumber form number
-     * @return
+     * @return true for success and false otherwise
      */
     private boolean GetFormData(String formNumber) {
         try {
@@ -69,26 +69,25 @@ public class FormGenerator extends Activity {
 //            InputStream is = url.openConnection().getInputStream();
             Element root = DocumentBuilderFactory.newInstance()
                     .newDocumentBuilder()
-                    .parse(getAssets().open("xmlgui1.xml"))
+                    .parse(getAssets().open("xmlGui.xml"))
                     .getDocumentElement();
 
             NodeList forms = root.getElementsByTagName("form");
             if (forms.getLength() < 1) {
-                // nothing here??
                 Log.e(Tag, "No form, let's bail");
                 return false;
             } else {
                 Node form = forms.item(0);
-                theForm = new Form();
+                this.form = new Form();
 
                 // process form level
                 NamedNodeMap map = form.getAttributes();
-                theForm.setNo(map.getNamedItem("id").getNodeValue());
-                theForm.setName(map.getNamedItem("name").getNodeValue());
+                this.form.setNo(map.getNamedItem("id").getNodeValue());
+                this.form.setName(map.getNamedItem("name").getNodeValue());
                 if (map.getNamedItem("submitTo") != null)
-                    theForm.setSubmitTo(map.getNamedItem("submitTo").getNodeValue());
+                    this.form.setSubmitTo(map.getNamedItem("submitTo").getNodeValue());
                 else
-                    theForm.setSubmitTo("loopback");
+                    this.form.setSubmitTo("loopback");
 
                 // now process the fields
                 NodeList fields = root.getElementsByTagName("field");
@@ -104,10 +103,10 @@ public class FormGenerator extends Activity {
                     else
                         tempField.setRequired(false);
                     tempField.setOptions(attr.getNamedItem("options").getNodeValue());
-                    theForm.getFields().add(tempField);
+                    this.form.getFields().add(tempField);
                 }
 
-                Log.i(Tag, theForm.toString());
+                Log.i(Tag, this.form.toString());
                 return true;
             }
 
@@ -130,26 +129,26 @@ public class FormGenerator extends Activity {
             // walk through the form elements and dynamically create them,
             // leveraging the mini library of tools.
             int i;
-            for (i = 0; i < theForm.fields.size(); i++) {
-                if (theForm.fields.elementAt(i).getType().equals("text")) {
-                    theForm.fields.elementAt(i).obj = new
-                            XmlGuiEditBox(this, (theForm.fields.elementAt(i).isRequired()
-                            ? "*" : "") + theForm.fields.elementAt(i).getLabel(), "");
-                    ll.addView((View) theForm.fields.elementAt(i).obj);
+            for (i = 0; i < form.fields.size(); i++) {
+                if (form.fields.elementAt(i).getType().equals("text")) {
+                    form.fields.elementAt(i).obj = new
+                            EditBox(this, (form.fields.elementAt(i).isRequired()
+                            ? "*" : "") + form.fields.elementAt(i).getLabel(), "");
+                    ll.addView((View) form.fields.elementAt(i).obj);
                 }
-                if (theForm.fields.elementAt(i).getType().equals("numeric")) {
-                    theForm.fields.elementAt(i).obj = new
-                            XmlGuiEditBox(this, (theForm.fields.elementAt(i).isRequired()
-                            ? "*" : "") + theForm.fields.elementAt(i).getLabel(), "");
-                    ((XmlGuiEditBox) theForm.fields.elementAt(i).obj).makeNumeric();
-                    ll.addView((View) theForm.fields.elementAt(i).obj);
+                if (form.fields.elementAt(i).getType().equals("numeric")) {
+                    form.fields.elementAt(i).obj = new
+                            EditBox(this, (form.fields.elementAt(i).isRequired()
+                            ? "*" : "") + form.fields.elementAt(i).getLabel(), "");
+                    ((EditBox) form.fields.elementAt(i).obj).makeNumeric();
+                    ll.addView((View) form.fields.elementAt(i).obj);
                 }
-                if (theForm.fields.elementAt(i).getType().equals("choice")) {
-                    theForm.fields.elementAt(i).obj = new
-                            XmlGuiPickOne(this, (theForm.fields.elementAt(i).isRequired()
-                            ? "*" : "") + theForm.fields.elementAt(i).getLabel(),
-                            theForm.fields.elementAt(i).getOptions());
-                    ll.addView((View) theForm.fields.elementAt(i).obj);
+                if (form.fields.elementAt(i).getType().equals("choice")) {
+                    form.fields.elementAt(i).obj = new
+                            PickOne(this, (form.fields.elementAt(i).isRequired()
+                            ? "*" : "") + form.fields.elementAt(i).getLabel(),
+                            form.fields.elementAt(i).getOptions());
+                    ll.addView((View) form.fields.elementAt(i).obj);
                 }
             }
 
@@ -175,9 +174,9 @@ public class FormGenerator extends Activity {
                         return;
 
                     }
-                    if (theForm.getSubmitTo().equals("loopback")) {
+                    if (form.getSubmitTo().equals("loopback")) {
                         // just display the results to the screen
-                        String formResults = theForm.getFormattedResults();
+                        String formResults = form.getFormattedResults();
                         Log.i(Tag, formResults);
                         AlertDialog.Builder bd = new AlertDialog.Builder(ll.getContext());
                         AlertDialog ad = bd.create();
@@ -201,7 +200,7 @@ public class FormGenerator extends Activity {
             });
 
             setContentView(sv);
-            setTitle(theForm.getName());
+            setTitle(form.getName());
 
             return true;
 
@@ -217,12 +216,12 @@ public class FormGenerator extends Activity {
             boolean good = true;
 
 
-            for (i = 0; i < theForm.fields.size(); i++) {
+            for (i = 0; i < form.fields.size(); i++) {
                 String fieldValue = (String)
-                        theForm.fields.elementAt(i).getData();
-                Log.i(Tag, theForm.fields.elementAt(i)
+                        form.fields.elementAt(i).getData();
+                Log.i(Tag, form.fields.elementAt(i)
                         .getName() + " is [" + fieldValue + "]");
-                if (theForm.fields.elementAt(i).isRequired()) {
+                if (form.fields.elementAt(i).isRequired()) {
                     if (fieldValue == null) {
                         good = false;
                     } else {
@@ -245,7 +244,7 @@ public class FormGenerator extends Activity {
         try {
             boolean ok = true;
             this.progressDialog = ProgressDialog.show(this,
-                    theForm.getName(), "Saving Form Data", true, false);
+                    form.getName(), "Saving Form Data", true, false);
             this.progressHandler = new Handler() {
 
                 @Override
@@ -269,7 +268,7 @@ public class FormGenerator extends Activity {
 
             };
 
-            Thread workthread = new Thread(new TransmitFormData(theForm));
+            Thread workthread = new Thread(new TransmitFormData(form));
 
             workthread.start();
 

@@ -1,6 +1,8 @@
 package co.celloscope.billingsystemdemo;
 
-// class to handle each individual form
+/**
+ * Represent a form field
+ */
 public class Field {
     String name;
     String label;
@@ -8,10 +10,7 @@ public class Field {
     boolean required;
     String options;
     Object obj;   // holds the ui implementation
-    // or the EditText for example
 
-
-    // getters & setters
     public String getName() {
         return name;
     }
@@ -66,13 +65,13 @@ public class Field {
         if (type.equals("text") || type.equals("numeric"))
         {
             if (obj != null) {
-                XmlGuiEditBox b = (XmlGuiEditBox) obj;
+                EditBox b = (EditBox) obj;
                 return b.getValue();
             }
         }
         if (type.equals("choice")) {
             if (obj != null) {
-                XmlGuiPickOne po = (XmlGuiPickOne) obj;
+                PickOne po = (PickOne) obj;
                 return po.getValue();
             }
         }

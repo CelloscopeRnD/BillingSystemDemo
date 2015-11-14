@@ -7,13 +7,13 @@ import android.widget.TextView;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 
-public class XmlGuiPickOne extends LinearLayout {
-    String tag = XmlGuiPickOne.class.getName();
+public class PickOne extends LinearLayout {
+    String tag = PickOne.class.getName();
     TextView label;
     ArrayAdapter<String> aa;
     Spinner spinner;
 
-    public XmlGuiPickOne(Context context,String labelText,String options) {
+    public PickOne(Context context, String labelText, String options) {
         super(context);
         label = new TextView(context);
         label.setText(labelText);
@@ -26,7 +26,7 @@ public class XmlGuiPickOne extends LinearLayout {
         this.addView(spinner);
     }
 
-    public XmlGuiPickOne(Context context, AttributeSet attrs) {
+    public PickOne(Context context, AttributeSet attrs) {
         super(context, attrs);
         // TODO Auto-generated constructor stub
     }
